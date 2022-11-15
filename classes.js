@@ -25,6 +25,7 @@ class Word {
         this.index = index;
         this.sanitized = sanitized;
         this.segments = segments;
+        this.corrected = false;
     }
 
     sanitize() {
