@@ -10,6 +10,14 @@
     flex-direction: column;
 }
 
+.flexRow {
+    display: flex;
+}
+
+.hidden {
+    display: none;
+}
+
 .marginTop {
     margin-top: 20px;
 }
@@ -17,4 +25,8 @@
 .textAreaSizing {
     height: 200px;
     width: 800px;
+}
+
+.errorText {
+    background-color: red;
 }
