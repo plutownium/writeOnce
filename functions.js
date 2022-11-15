@@ -81,13 +81,21 @@ function showRemoverBtn(removerTool) {
     removerTool.classList.remove("hidden");
 }
 
+function hideRemoverBtn(removerTool) {
+    removerTool.classList.add("hidden");
+}
+
 function deleteAdverbs(correctedWords, host) {
+    const wordsToDelete = [];
     for (const word of correctedWords) {
-        console.log(word, "86rm");
-        if (word.hasCorrection && word.getCorrection().type) {
-            host.delete(word);
+        // console.log(word, "86rm");
+        if (word.hasCorrection() && word.getCorrection().type) {
+            console.log("Deleting...", word.original, "88rm");
+            // host.delete(word);
+            wordsToDelete.push(word);
         }
     }
+    host.delete(wordsToDelete);
 }
 
 function setHTML(newHTML, targetEl) {

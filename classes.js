@@ -7,12 +7,12 @@ class Host {
         this.host.innerText = text;
     }
 
-    delete(word) {
+    delete(wordsToDelete) {
         // by index
+        const indexes = wordsToDelete.map(word => word.index);
         const toModify = this.host.innerText;
         const modified = toModify.split(" ").filter((text, index) => {
-            console.log(word.getIndex(), "126rm");
-            if (word.getIndex()) return "";
+            if (indexes.includes(index)) return "";
             else return text;
         });
         this.host.innerText = modified.join(" ");

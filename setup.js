@@ -40,6 +40,7 @@ const textHost = new Host(output);
 const removeAdverbsBtn = document.getElementById("removeAdverbsBtn");
 removeAdverbsBtn.addEventListener("click", () => {
     deleteAdverbs(wordsWithCorrections, textHost);
+    hideRemoverBtn(removeAdverbsBtn);
 });
 
 //
