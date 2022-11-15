@@ -1,6 +1,8 @@
-.textAreaSizing {
-    height: 100px;
-    width: 400px;
+.alignCenter {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .flexCol {
@@ -8,9 +10,11 @@
     flex-direction: column;
 }
 
-.alignCenter {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+.marginTop {
+    margin-top: 20px;
+}
+
+.textAreaSizing {
+    height: 200px;
+    width: 800px;
 }
