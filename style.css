@@ -1,0 +1,16 @@
+.textAreaSizing {
+    height: 100px;
+    width: 400px;
+}
+
+.flexCol {
+    display: flex;
+    flex-direction: column;
+}
+
+.alignCenter {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
