@@ -70,7 +70,7 @@ document.getElementById("adverbCheck").addEventListener("click", () => {
         }
     }
     // highlight the adverbs
-    const outputHTML = highlightAdverbsFromWords(wordsWithCorrections, output);
+    const outputHTML = generateHTMLWithHighlights(wordsWithCorrections, output);
     console.log(outputHTML, "155rm");
     removeUnfixedText();
     setHTML(outputHTML, output);

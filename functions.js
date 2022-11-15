@@ -33,10 +33,19 @@ function findAdverbs(wordsArr) {
     return wordsArr;
 }
 
-function showError(correction) {
+function showErrorFromOriginal(originalText) {
+    const span = document.createElement("span");
+    span.classList.add("errorText");
+    span.classList.add("fadeInRed");
+    span.innerText = originalText + " ";
+    return span;
+}
+
+function showErrorFromCorrection(correction) {
     console.log(correction, "85rm");
     const span = document.createElement("span");
     span.classList.add("errorText");
+    span.classList.add("fadeInRed");
     console.log(span, "87rm");
     span.innerText = correction.fixed + " ";
     console.log(span, "87rm");
@@ -50,11 +59,17 @@ function showPlain(someText) {
     return span;
 }
 
-function highlightAdverbsFromWords(wordsArr, outputEl) {
+// highlightAdverbsFromWords
+function generateHTMLWithHighlights(wordsArr, outputEl) {
+    const showCorrected = false; // hardcode
     let zip = [];
     for (const word of wordsArr) {
         if (word.hasCorrection()) {
-            zip.push(showError(word.getCorrection()));
+            if (showCorrected) {
+                zip.push(showErrorFromCorrection(word.getCorrection()));
+            } else {
+                zip.push(showErrorFromOriginal(word.getOriginal()));
+            }
         } else {
             zip.push(showPlain(word.getOriginal()));
         }

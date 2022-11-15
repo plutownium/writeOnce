@@ -27,6 +27,52 @@
     width: 800px;
 }
 
+.fadeToWhite {
+    animation: fadeToWhite;
+}
+
+.fadeInRed {
+    animation: fadeInRed 3s;
+}
+
 .errorText {
     background-color: red;
+}
+
+@-o-keyframes fadeToWhite {
+    0% {
+        background-color: red;
+    }
+
+    100% {
+        background-color: #ffffff;
+    }
+}
+@keyframes fadeToWhite {
+    0% {
+        background-color: red;
+    }
+
+    100% {
+        background-color: #ffffff;
+    }
+}
+
+@-o-keyframes fadeInRed {
+    0% {
+        background-color: #ffffff;
+    }
+
+    100% {
+        background-color: red;
+    }
+}
+@keyframes fadeInRed {
+    0% {
+        background-color: #ffffff;
+    }
+
+    100% {
+        background-color: red;
+    }
 }
