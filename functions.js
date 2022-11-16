@@ -15,6 +15,18 @@ function sanitizeLargeText(text) {
     return sanitized;
 }
 
+function splitBySentence(text) {
+    const endings = ["? ", ". ", "! ", `?" `, `!" `, `." `];
+    // const sentences = [];
+    const byQuestionMark = text.split(endings[0]);
+    const byPeriod = byQuestionMark.map(potentiallyTwoSentences => potentiallyTwoSentences.split(endings[1])).flat();
+    const byExclamation = byPeriod.map(potentiallyTwoSentences => potentiallyTwoSentences.split(endings[2])).flat();
+    const byQuotedQuestionMark = byExclamation.map(potentiallyTwoSentences => potentiallyTwoSentences.split(endings[3])).flat();
+    const byQuotedPeriod = byQuotedQuestionMark.map(p => p.split(endings[4])).flat();
+    const byQuotedExclamationMark = byQuotedPeriod.map(p => p.split(endings[5])).flat(); // really "all"
+    return byQuotedExclamationMark;
+}
+
 // function splitAndSanitize(txt) {
 //     const sanitized = txt.split(" ").map(word => {
 //         return word.replace(/[^A-Za-z]/gi, "");
@@ -33,6 +45,44 @@ function findAdverbs(wordsArr) {
     return wordsArr;
 }
 
+function findRepeatWords(sentencesArr) {
+    // return a wordsArr
+    const wordsArr = [];
+    let currentSentenceWords = [];
+    let nextSentenceWords = [];
+    for (let i = 0; i < sentencesArr.length - 1; i++) {
+        currentSentenceWords = sentencesArr[i].replace(/[^A-Za-z0-9,\s]+/, "").split(" ");
+        nextSentenceWords = sentencesArr[i + 1].replace(/[^A-Za-z0-9,\s]+/, "").split(" ");
+        const intersection = currentSentenceWords.filter(element => nextSentenceWords.includes(element));
+        let words;
+        if (intersection.length > 0) {
+            // repeats? tag the repeats. the non-repeats are just normal words
+            // TODO;
+            words = currentSentenceWords.map(word => {
+                const w = sanitizeWord(word);
+                if (intersection.includes(word)) {
+                    w.setCorrection(word, "repeat");
+                }
+                return w;
+            });
+        } else {
+            // no repeats;
+            // todo
+            words = currentSentenceWords.map(word => {
+                const w = sanitizeWord(word);
+                return w;
+            });
+        }
+        wordsArr.push(words);
+        for (let j = 0; j < words.length; j++) {
+            wordsArr.push(words[j]);
+        }
+    }
+
+    return wordsArr.flat();
+}
+
+// error makers
 function showErrorFromOriginal(originalText) {
     const span = document.createElement("span");
     span.classList.add("errorText");
@@ -60,7 +110,25 @@ function showPlain(someText) {
 }
 
 // highlightAdverbsFromWords
-function generateHTMLWithHighlights(wordsArr, outputEl) {
+function generateHTMLWithHighlights(wordsArr) {
+    const showCorrected = false; // hardcode
+    let zip = [];
+    for (const word of wordsArr) {
+        if (word.hasCorrection()) {
+            if (showCorrected) {
+                zip.push(showErrorFromCorrection(word.getCorrection()));
+            } else {
+                zip.push(showErrorFromOriginal(word.getOriginal()));
+            }
+        } else {
+            zip.push(showPlain(word.getOriginal()));
+        }
+    }
+    return zip;
+}
+
+// Repeats
+function generateHTMLWithHighlightsRepeats(wordsArr) {
     const showCorrected = false; // hardcode
     let zip = [];
     for (const word of wordsArr) {
