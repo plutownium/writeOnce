@@ -48,38 +48,71 @@ function findAdverbs(wordsArr) {
 function findRepeatWords(sentencesArr) {
     // return a wordsArr
     const wordsArr = [];
+    let repeats = [];
+    let prevSentenceWords = [];
     let currentSentenceWords = [];
     let nextSentenceWords = [];
+    let globalStringIndex = 0;
     for (let i = 0; i < sentencesArr.length - 1; i++) {
-        currentSentenceWords = sentencesArr[i].replace(/[^A-Za-z0-9,\s]+/, "").split(" ");
-        nextSentenceWords = sentencesArr[i + 1].replace(/[^A-Za-z0-9,\s]+/, "").split(" ");
-        const intersection = currentSentenceWords.filter(element => nextSentenceWords.includes(element));
-        let words;
-        if (intersection.length > 0) {
-            // repeats? tag the repeats. the non-repeats are just normal words
-            // TODO;
-            words = currentSentenceWords.map(word => {
-                const w = sanitizeWord(word);
-                if (intersection.includes(word)) {
-                    w.setCorrection(word, "repeat");
-                }
-                return w;
-            });
+        if (i === 0) {
+            currentSentenceWords = sentencesArr[i].replace(/[^A-Za-z0-9,\s]+/, "").split(" ");
+            // nextSentenceWords = sentencesArr[i + 1].replace(/[^A-Za-z0-9,\s]+/, "").split(" ");
         } else {
-            // no repeats;
-            // todo
-            words = currentSentenceWords.map(word => {
-                const w = sanitizeWord(word);
-                return w;
-            });
+            prevSentenceWords = currentSentenceWords;
+            currentSentenceWords = nextSentenceWords;
         }
-        wordsArr.push(words);
+        // unavoidably, this string must be made as it "eats" its way to end
+        nextSentenceWords = sentencesArr[i + 1].replace(/[^A-Za-z0-9,\s]+/, "").split(" ");
+        const outgoingIntersection = currentSentenceWords.filter(element => nextSentenceWords.includes(element));
+        console.log(outgoingIntersection, "57rm");
+        repeats = [repeats[1], outgoingIntersection];
+        const currentRepeatsButFlat = repeats.flat();
+        // repeats? tag the repeats. the non-repeats are just normal words
+        // TODO;
+        const words = currentSentenceWords.map(word => {
+            const w = sanitizeWord(word, globalStringIndex);
+            globalStringIndex++;
+            if (currentRepeatsButFlat.includes(word)) {
+                w.setCorrection(word, "repeat");
+            }
+            return w;
+        });
+
         for (let j = 0; j < words.length; j++) {
             wordsArr.push(words[j]);
         }
     }
-
+    console.log(wordsArr, "82rm");
     return wordsArr.flat();
+}
+
+function findTooManyPrepositions(sentencesArr, prepositions) {
+    const words = [];
+    let globalStringIndex = 0;
+    for (let i = 0; i < sentencesArr.length; i++) {
+        const sentence = sentencesArr[i];
+        let detectedPreopositionsInThisSentence = 0;
+        const sentenceWords = sentence.split(" ");
+        for (const word of sentenceWords) {
+            if (prepositions.includes(word)) {
+                detectedPreopositionsInThisSentence++;
+            }
+        }
+        // if too many prepositions, highlight all prepositions
+        const withCorrections = sentenceWords.map(word => {
+            const w = sanitizeWord(word, globalStringIndex);
+            globalStringIndex++;
+            // issue correction if needed
+            console.log(w, "106rm");
+            if (prepositions.includes(word)) {
+                w.setCorrection(word, "prepositionOverload");
+            }
+            return w;
+        });
+        words.push(withCorrections);
+    }
+    console.log(words, "112rm");
+    return words.flat();
 }
 
 // error makers
@@ -88,6 +121,7 @@ function showErrorFromOriginal(originalText) {
     span.classList.add("errorText");
     span.classList.add("fadeInRed");
     span.innerText = originalText + " ";
+    console.log(originalText, "93rm");
     return span;
 }
 
@@ -104,13 +138,12 @@ function showErrorFromCorrection(correction) {
 
 function showPlain(someText) {
     const span = document.createElement("span");
-    console.log(span, "87rm");
     span.innerText = someText + " ";
     return span;
 }
 
 // highlightAdverbsFromWords
-function generateHTMLWithHighlights(wordsArr) {
+function generateHTMLWithHighlightsForAdverbs(wordsArr) {
     const showCorrected = false; // hardcode
     let zip = [];
     for (const word of wordsArr) {
@@ -128,16 +161,25 @@ function generateHTMLWithHighlights(wordsArr) {
 }
 
 // Repeats
-function generateHTMLWithHighlightsRepeats(wordsArr) {
-    const showCorrected = false; // hardcode
+function generateHTMLWithHighlightsForRepeats(wordsArr) {
+    // note this func is DIFFERENT from the Adverbs one
     let zip = [];
     for (const word of wordsArr) {
         if (word.hasCorrection()) {
-            if (showCorrected) {
-                zip.push(showErrorFromCorrection(word.getCorrection()));
-            } else {
-                zip.push(showErrorFromOriginal(word.getOriginal()));
-            }
+            zip.push(showErrorFromOriginal(word.getOriginal()));
+        } else {
+            zip.push(showPlain(word.getOriginal()));
+        }
+    }
+    return zip;
+}
+
+function generateHTMLWithHighlightsForPrepositions(wordsArr) {
+    // note this is different from the Adverbs one
+    let zip = [];
+    for (const word of wordsArr) {
+        if (word.hasCorrection()) {
+            zip.push(showErrorFromOriginal(word.getOriginal()));
         } else {
             zip.push(showPlain(word.getOriginal()));
         }
@@ -182,9 +224,6 @@ function deleteAdverbs(correctedWords, host) {
 }
 
 function setHTML(newHTML, targetEl) {
-    console.log("Target el:", targetEl);
-    // targetEl.innerHTML = newHTML;
-    console.log(newHTML, targetEl, "164rm");
     for (const el of newHTML) {
         targetEl.appendChild(el);
     }
